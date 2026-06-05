@@ -1,10 +1,17 @@
+// SOLNCANET: Cal.com webhook -> NocoDB
+// URL:
+// https://solncanet-crm.netlify.app/.netlify/functions/cal-nocodb-v5
+//
+// Version v6: NocoDB v3 body fixed.
+// NocoDB expects: [{ fields: {...} }]
+
 const DEFAULT_NOCODB_ENDPOINT = "https://app.nocodb.com/api/v3/data/ptvxn8nmuwc08y3/mgp2zjsuv4id5tp/records";
 
 exports.handler = async function(event) {
   if (event.httpMethod === "GET") {
     return send(200, {
       ok: true,
-      version: "v5",
+      version: "v6-fields-fix",
       service: "SOLNCANET Cal.com to NocoDB",
       hasNocodbToken: Boolean(process.env.NOCODB_TOKEN),
       endpoint: process.env.NOCODB_ENDPOINT || DEFAULT_NOCODB_ENDPOINT
@@ -69,7 +76,7 @@ exports.handler = async function(event) {
         "Content-Type": "application/json",
         "xc-token": token
       },
-      body: JSON.stringify([record])
+      body: JSON.stringify([{ fields: record }])
     });
 
     const text = await nc.text();
@@ -79,14 +86,14 @@ exports.handler = async function(event) {
         ok: false,
         error: "NocoDB error",
         status: nc.status,
-        nocodbResponse: text,
+        nocodbResponse: parseJson(text),
         record: record
       });
     }
 
     return send(200, {
       ok: true,
-      version: "v5",
+      version: "v6-fields-fix",
       message: "Saved to NocoDB",
       record: record,
       nocodbResponse: parseJson(text)

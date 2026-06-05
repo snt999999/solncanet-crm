@@ -1,4 +1,11 @@
-const NOCODB_ENDPOINT = "https://app.nocodb.com/api/v3/data/ptvxn8nmuwc08y3/mgp2zjsuv4id5tp/records";
+// SOLNCANET: direct NocoDB test function
+// URL:
+// https://solncanet-crm.netlify.app/.netlify/functions/nocodb-test
+//
+// Version v6: NocoDB v3 body fixed.
+// NocoDB expects: [{ fields: {...} }]
+
+const NOCODB_ENDPOINT = process.env.NOCODB_ENDPOINT || "https://app.nocodb.com/api/v3/data/ptvxn8nmuwc08y3/mgp2zjsuv4id5tp/records";
 
 exports.handler = async function(event) {
   const token = process.env.NOCODB_TOKEN;
@@ -31,7 +38,7 @@ exports.handler = async function(event) {
         "Content-Type": "application/json",
         "xc-token": token
       },
-      body: JSON.stringify([testRecord])
+      body: JSON.stringify([{ fields: testRecord }])
     });
 
     const text = await response.text();
